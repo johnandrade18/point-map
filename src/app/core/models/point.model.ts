@@ -7,7 +7,7 @@ export type Coordinates = [number, number];
  * Properties required for a Point of Interest feature.
  * Additional (extra) properties are allowed and preserved.
  */
-export interface PoiProperties {
+export interface PointProperties {
   name: string;
   category: string;
   [key: string]: unknown;
@@ -16,20 +16,20 @@ export interface PoiProperties {
 /**
  * A GeoJSON Feature representing a single Point of Interest.
  */
-export interface PoiFeature {
+export interface PointFeature {
   type: 'Feature';
   id: string;
   geometry: {
     type: 'Point';
     coordinates: Coordinates;
   };
-  properties: PoiProperties;
+  properties: PointProperties;
 }
 
 /**
  * A GeoJSON FeatureCollection holding POI features.
  */
-export interface PoiFeatureCollection {
+export interface PointFeatureCollection {
   type: 'FeatureCollection';
-  features: PoiFeature[];
+  features: PointFeature[];
 }

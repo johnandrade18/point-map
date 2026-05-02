@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { PoiFeature, Coordinates } from '../models/point.model';
+import { Coordinates, PointFeature } from '../models/point.model';
 import { DiscardReason } from '../models/import-result.model';
 
 // ---------------------------------------------------------------------------
@@ -8,7 +8,7 @@ import { DiscardReason } from '../models/import-result.model';
 
 export interface ValidationSuccess {
   valid: true;
-  feature: PoiFeature;
+  feature: PointFeature;
 }
 
 export interface ValidationFailure {
@@ -92,7 +92,7 @@ export function validateGeoJsonFeature(raw: unknown): ValidationResult {
     return fail('invalid-category');
   }
 
-  const feature: PoiFeature = {
+  const feature: PointFeature = {
     type: 'Feature',
     id: resolveId(obj['id']),
     geometry: {
@@ -100,7 +100,7 @@ export function validateGeoJsonFeature(raw: unknown): ValidationResult {
       coordinates: geom['coordinates'] as Coordinates,
     },
     properties: {
-      ...(props as PoiFeature['properties']),
+      ...(props as PointFeature['properties']),
       name: (props['name'] as string).trim(),
       category: (props['category'] as string).trim(),
     },
