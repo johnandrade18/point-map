@@ -1,0 +1,65 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "poi-001",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.6506, -33.4429] },
+      "properties": { "name": "Palacio de La Moneda", "category": "landmark" }
+    },
+    {
+      "id": "poi-002",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.65, -33.4378] },
+      "properties": { "name": "Plaza de Armas", "category": "square" }
+    },
+    {
+      "id": "poi-003",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.6317, -33.4263] },
+      "properties": { "name": "Cerro San Cristóbal (Funicular)", "category": "viewpoint" }
+    },
+    {
+      "id": "poi-004",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.605, -33.417] },
+      "properties": { "name": "Costanera Center", "category": "mall" }
+    },
+    {
+      "id": "poi-005",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.6109, -33.4629] },
+      "properties": { "name": "Estadio Nacional", "category": "stadium" }
+    },
+    {
+      "id": "poi-006",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.6027, -33.4047] },
+      "properties": { "name": "Parque Bicentenario", "category": "park" }
+    },
+    {
+      "id": "poi-007",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.7006, -33.451] },
+      "properties": { "name": "Estación Central", "category": "station" }
+    },
+    {
+      "id": "poi-008",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.689, -33.4517] },
+      "properties": { "name": "Terminal Alameda", "category": "bus_terminal" }
+    },
+    {
+      "id": "poi-009",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.5757, -33.5218] },
+      "properties": { "name": "Mall Plaza Vespucio", "category": "mall" }
+    },
+    {
+      "id": "poi-010",
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-70.7858, -33.3929] },
+      "properties": { "name": "Aeropuerto Arturo Merino Benítez (SCL)", "category": "airport" }
+    }
+  ]
+}
