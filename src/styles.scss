@@ -1,1 +1,51 @@
 /* You can add global styles to this file, and also import other style files */
+// Angular Material theming
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary-palette: mat.m2-define-palette(mat.$m2-indigo-palette, 700);
+$accent-palette: mat.m2-define-palette(mat.$m2-amber-palette, A200, A100, A400);
+$warn-palette: mat.m2-define-palette(mat.$m2-red-palette);
+
+$theme: mat.m2-define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+    warn: $warn-palette,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($theme);
+
+// Global resets
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  background: #f5f5f5;
+}
+
+// MapLibre attribution override — keep it visible but unobtrusive
+.maplibregl-ctrl-attrib {
+  font-size: 10px !important;
+}
+
+// Ensure the map canvas fills its container
+.maplibregl-map {
+  width: 100%;
+  height: 100%;
+}
+
+// Remove default scrollbar styling issues in mat-list
+.mat-mdc-list-item {
+  height: auto !important;
+  min-height: 56px;
+}
