@@ -41,12 +41,24 @@ export class GeoJsonImportService {
     return { features, result: { imported: features.length, discarded } };
   }
 
+  /** Maximum accepted file size in bytes (10 MB). */
+  static readonly MAX_FILE_SIZE = 10 * 1024 * 1024;
+
   /**
    * Reads a File as text, parses it as JSON, then delegates to parseFeatureCollection.
+   * Throws if the file exceeds MAX_FILE_SIZE or contains invalid JSON.
    */
   async parseFile(file: File): Promise<ParsedImport> {
+    if (file.size > GeoJsonImportService.MAX_FILE_SIZE) {
+      throw new Error(`File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum allowed size is 10 MB.`);
+    }
     const text = await file.text();
-    const raw: unknown = JSON.parse(text);
+    let raw: unknown;
+    try {
+      raw = JSON.parse(text);
+    } catch {
+      throw new Error('Invalid JSON — the file could not be parsed.');
+    }
     return this.parseFeatureCollection(raw);
   }
 

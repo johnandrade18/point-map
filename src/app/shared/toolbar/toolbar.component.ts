@@ -52,7 +52,15 @@ import { ThemeService } from '../../core/services/theme.service';
       type="file"
       accept=".geojson,application/geo+json,application/json"
       style="display:none"
-      (change)="onFileSelected($event)"
+      (change)="onFileSelected($event, 'replace')"
+      aria-hidden="true"
+    />
+    <input
+      #appendFileInput
+      type="file"
+      accept=".geojson,application/geo+json,application/json"
+      style="display:none"
+      (change)="onFileSelected($event, 'append')"
       aria-hidden="true"
     />
 
@@ -110,15 +118,26 @@ import { ThemeService } from '../../core/services/theme.service';
 
       <div class="tb-divider"></div>
 
-      <!-- Import -->
+      <!-- Import (replace) -->
       <button
         class="tb-btn"
         (click)="fileInput.click()"
-        matTooltip="Import a GeoJSON FeatureCollection"
+        matTooltip="Import a GeoJSON FeatureCollection — replaces current data"
         aria-label="Import GeoJSON"
       >
         <svg lucideUpload [size]="15"></svg>
         <span>Import</span>
+      </button>
+
+      <!-- Import (append) -->
+      <button
+        class="tb-btn tb-btn--icon"
+        (click)="appendFileInput.click()"
+        matTooltip="Append GeoJSON — merges with existing points"
+        aria-label="Append GeoJSON"
+      >
+        <svg lucideUpload [size]="15"></svg>
+        <span style="font-size:9px;line-height:1">+</span>
       </button>
 
       <!-- Export GeoJSON -->
@@ -290,12 +309,17 @@ export class ToolbarComponent {
   private readonly snackBar = inject(MatSnackBar);
 
   @ViewChild('fileInput') private fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('appendFileInput') private appendFileInput!: ElementRef<HTMLInputElement>;
 
   // ── Keyboard shortcuts ──────────────────────────────────────────────────────
   @HostListener('document:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
     const mod = e.ctrlKey || e.metaKey;
     if (!mod) return;
+
+    // Don't intercept shortcuts while the user is typing in a form field
+    const target = e.target as HTMLElement;
+    if (target.matches('input, textarea, select, [contenteditable]')) return;
 
     if (e.key === 'z' && !e.shiftKey) {
       e.preventDefault();
@@ -306,7 +330,7 @@ export class ToolbarComponent {
     }
   }
 
-  async onFileSelected(event: Event): Promise<void> {
+  async onFileSelected(event: Event, mode: 'replace' | 'append' = 'replace'): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
@@ -314,15 +338,17 @@ export class ToolbarComponent {
 
     try {
       const { features, result } = await this.importer.parseFile(file);
-      this.store.importPoints(features, result);
+      this.store.importPoints(features, result, mode);
+      const action = mode === 'append' ? 'Appended' : 'Imported';
       this.snackBar.open(
-        `Imported ${result.imported} Point(s) of Interest` +
+        `${action} ${result.imported} Point(s) of Interest` +
           (result.discarded.length > 0 ? ` — ${result.discarded.length} discarded` : ''),
         'OK',
         { duration: 4000 }
       );
-    } catch {
-      this.snackBar.open('Failed to parse file — is it valid JSON?', 'OK', { duration: 5000 });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to parse file — is it valid JSON?';
+      this.snackBar.open(message, 'OK', { duration: 5000 });
     }
   }
 

@@ -27,9 +27,9 @@ export class PointStoreService {
   /** Non-null while a duplicate POI is within threshold distance. */
   private readonly _duplicateWarning = signal<string | null>(null);
 
-  /** Undo/redo stacks hold snapshots of the POINT array (max 50 entries each). */
-  private readonly _undoStack = signal<PointFeature[][]>([]);
-  private readonly _redoStack = signal<PointFeature[][]>([]);
+  /** Undo/redo stacks hold snapshots of points + selection (max 50 entries each). */
+  private readonly _undoStack = signal<{ points: PointFeature[]; selectedId: string | null }[]>([]);
+  private readonly _redoStack = signal<{ points: PointFeature[]; selectedId: string | null }[]>([]);
 
   // ---------------------------------------------------------------------------
   // Public read-only signals
@@ -152,10 +152,15 @@ export class PointStoreService {
     this._isAddMode.set(value);
   }
 
-  importPoints(features: PointFeature[], result: ImportResult): void {
-    this._points.set(features);
+  importPoints(features: PointFeature[], result: ImportResult, mode: 'replace' | 'append' = 'replace'): void {
+    if (mode === 'append') {
+      this.pushUndo();
+      this._points.update((existing) => [...existing, ...features]);
+    } else {
+      this._points.set(features);
+      this._selectedId.set(null);
+    }
     this._importSummary.set(result);
-    this._selectedId.set(null);
   }
 
   setSearchQuery(query: string): void {
@@ -195,19 +200,27 @@ export class PointStoreService {
   undo(): void {
     const stack = this._undoStack();
     if (stack.length === 0) return;
-    this._redoStack.update((s) => [...s.slice(-49), [...this._points()]]);
-    this._points.set(stack[stack.length - 1]);
+    this._redoStack.update((s) => [
+      ...s.slice(-49),
+      { points: [...this._points()], selectedId: this._selectedId() },
+    ]);
+    const snapshot = stack[stack.length - 1];
+    this._points.set(snapshot.points);
+    this._selectedId.set(snapshot.selectedId);
     this._undoStack.update((s) => s.slice(0, -1));
-    this._selectedId.set(null);
   }
 
   redo(): void {
     const stack = this._redoStack();
     if (stack.length === 0) return;
-    this._undoStack.update((s) => [...s.slice(-49), [...this._points()]]);
-    this._points.set(stack[stack.length - 1]);
+    this._undoStack.update((s) => [
+      ...s.slice(-49),
+      { points: [...this._points()], selectedId: this._selectedId() },
+    ]);
+    const snapshot = stack[stack.length - 1];
+    this._points.set(snapshot.points);
+    this._selectedId.set(snapshot.selectedId);
     this._redoStack.update((s) => s.slice(0, -1));
-    this._selectedId.set(null);
   }
 
   // ---------------------------------------------------------------------------
@@ -215,7 +228,10 @@ export class PointStoreService {
   // ---------------------------------------------------------------------------
 
   private pushUndo(): void {
-    this._undoStack.update((s) => [...s.slice(-49), [...this._points()]]);
+    this._undoStack.update((s) => [
+      ...s.slice(-49),
+      { points: [...this._points()], selectedId: this._selectedId() },
+    ]);
     this._redoStack.set([]);
   }
 

@@ -17,6 +17,10 @@ export interface NominatimSearchResult {
 export class NominatimService {
   private readonly http = inject(HttpClient);
   private readonly BASE = 'https://nominatim.openstreetmap.org';
+  private readonly HEADERS = {
+    'Accept-Language': 'en',
+    'User-Agent': 'POI-Map-Editor/1.0 (https://github.com/johnandrade18/point-map)',
+  };
 
   /**
    * Returns a short human-readable address for the given coordinates,
@@ -27,7 +31,7 @@ export class NominatimService {
       const result = await firstValueFrom(
         this.http.get<{ display_name: string }>(`${this.BASE}/reverse`, {
           params: { lat: String(lat), lon: String(lon), format: 'json' },
-          headers: { 'Accept-Language': 'en' },
+          headers: this.HEADERS,
         }),
       );
       const parts = result.display_name.split(',');
@@ -46,7 +50,7 @@ export class NominatimService {
       return await firstValueFrom(
         this.http.get<NominatimSearchResult[]>(`${this.BASE}/search`, {
           params: { q: query, format: 'json', limit: '5' },
-          headers: { 'Accept-Language': 'en' },
+          headers: this.HEADERS,
         }),
       );
     } catch {

@@ -221,6 +221,7 @@ export class MapSearchComponent {
   selectResult(r: NominatimSearchResult): void {
     const lon = parseFloat(r.lon);
     const lat = parseFloat(r.lat);
+    if (isNaN(lon) || isNaN(lat)) return;
     this.ngZone.runOutsideAngular(() => this.renderer.flyTo(lon, lat, 14));
     this.clear();
   }
