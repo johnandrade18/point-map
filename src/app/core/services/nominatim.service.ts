@@ -19,7 +19,7 @@ export class NominatimService {
   private readonly BASE = 'https://nominatim.openstreetmap.org';
   private readonly HEADERS = {
     'Accept-Language': 'en',
-    'User-Agent': 'POI-Map-Editor/1.0 (https://github.com/johnandrade18/point-map)',
+    'User-Agent': 'Point-Map/1.0 (https://github.com/johnandrade18/point-map)',
   };
 
   /**

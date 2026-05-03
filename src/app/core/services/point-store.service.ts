@@ -127,6 +127,7 @@ export class PointStoreService {
   }
 
   deletePoint(id: string): void {
+    this.pushUndo();
     this._points.update((points) => points.filter((p) => p.id !== id));
     if (this._selectedId() === id) {
       this._selectedId.set(null);
@@ -156,11 +157,16 @@ export class PointStoreService {
     if (mode === 'append') {
       this.pushUndo();
       this._points.update((existing) => [...existing, ...features]);
+      this._selectedId.set(null);
+      this._importSummary.set(result);
+      this._fitBoundsTick.update((t) => t + 1);
     } else {
+      this.pushUndo();
       this._points.set(features);
       this._selectedId.set(null);
+      this._importSummary.set(result);
+      this._fitBoundsTick.update((t) => t + 1);
     }
-    this._importSummary.set(result);
   }
 
   setSearchQuery(query: string): void {
@@ -184,12 +190,14 @@ export class PointStoreService {
   }
 
   reset(): void {
+    this.pushUndo();
     this._points.set([]);
     this._selectedId.set(null);
     this._importSummary.set(null);
     this._isAddMode.set(false);
     this._searchQuery.set('');
     this._categoryFilter.set('');
+    this._duplicateWarning.set(null);
     this.storage.clear();
   }
 
@@ -219,8 +227,8 @@ export class PointStoreService {
     ]);
     const snapshot = stack[stack.length - 1];
     this._points.set(snapshot.points);
-    this._selectedId.set(snapshot.selectedId);
     this._redoStack.update((s) => s.slice(0, -1));
+    this._selectedId.set(snapshot.selectedId);
   }
 
   // ---------------------------------------------------------------------------
