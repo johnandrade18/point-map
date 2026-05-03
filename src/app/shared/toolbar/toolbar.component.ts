@@ -131,13 +131,13 @@ import { ThemeService } from '../../core/services/theme.service';
 
       <!-- Import (append) -->
       <button
-        class="tb-btn tb-btn--icon"
+        class="tb-btn"
         (click)="appendFileInput.click()"
         matTooltip="Append GeoJSON — merges with existing points"
         aria-label="Append GeoJSON"
       >
         <svg lucideUpload [size]="15"></svg>
-        <span style="font-size:9px;line-height:1">+</span>
+        <span>Add</span>
       </button>
 
       <!-- Export GeoJSON -->
@@ -154,13 +154,14 @@ import { ThemeService } from '../../core/services/theme.service';
 
       <!-- Export CSV -->
       <button
-        class="tb-btn tb-btn--icon"
+        class="tb-btn"
         (click)="onExportCsv()"
         matTooltip="Download Points of Interest as CSV (name, category, lat, lng)"
         aria-label="Export CSV"
         [disabled]="store.points().length === 0"
       >
         <svg lucideFileSpreadsheet [size]="15"></svg>
+        <span>CSV</span>
       </button>
 
       <div class="tb-divider"></div>

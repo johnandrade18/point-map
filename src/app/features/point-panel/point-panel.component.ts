@@ -7,8 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { LucideSearch, LucideX, LucideSlidersHorizontal } from '@lucide/angular';
 import { PointStoreService } from '../../core/services/point-store.service';
 import { ImportSummaryComponent } from './import-summary/import-summary.component';
-import { PoiListComponent } from './poi-list/poi-list.component';
-import { PoiFormComponent } from './poi-form/poi-form.component';
+import { PoiListComponent } from './point-list/point-list.component';
+import { PoiFormComponent } from './point-form/point-form.component';
 
 @Component({
   selector: 'app-point-panel',
@@ -80,11 +80,11 @@ import { PoiFormComponent } from './poi-form/poi-form.component';
 
       <!-- POI list -->
       <div class="list-area">
-        <app-poi-list />
+        <app-point-list />
       </div>
 
       <!-- Edit form -->
-      <app-poi-form />
+      <app-point-form />
 
     </div>
   `,

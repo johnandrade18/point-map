@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ToolbarComponent } from './shared/toolbar/toolbar.component';
-import { PointPanelComponent } from './features/poi-panel/poi-panel.component';
+import { PointPanelComponent } from './features/point-panel/point-panel.component';
 import { MapComponent } from './features/map/map.component';
 import { MapSearchComponent } from './features/map/map-search/map-search.component';
 

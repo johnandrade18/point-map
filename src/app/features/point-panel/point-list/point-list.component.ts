@@ -48,7 +48,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 @Component({
-  selector: 'app-poi-list',
+  selector: 'app-point-list',
   standalone: true,
   imports: [DecimalPipe, LucideDynamicIcon, LucideMapPinOff],
   template: `

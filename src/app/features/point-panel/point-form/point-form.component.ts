@@ -20,7 +20,7 @@ const PREDEFINED_CATEGORIES = [
 ];
 
 @Component({
-  selector: 'app-poi-form',
+  selector: 'app-point-form',
   standalone: true,
   imports: [
     DecimalPipe,
