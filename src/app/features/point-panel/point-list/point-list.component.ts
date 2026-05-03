@@ -66,7 +66,10 @@ const CATEGORY_COLORS: Record<string, string> = {
             role="option"
             [class.poi-item--selected]="poi.id === store.selectedId()"
             [attr.aria-selected]="poi.id === store.selectedId()"
+            tabindex="0"
             (click)="select(poi)"
+            (keydown.enter)="select(poi)"
+            (keydown.space)="select(poi)"
           >
             <!-- Category icon pill -->
             <span class="cat-pill" [style.background]="catBg(poi)" [style.color]="catColor(poi)">

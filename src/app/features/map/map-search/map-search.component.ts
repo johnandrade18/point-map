@@ -58,6 +58,7 @@ import { MapRendererService } from '../map-renderer.service';
             <li
               class="result-item"
               role="option"
+              [attr.aria-selected]="false"
               (click)="selectResult(r)"
               (keydown.enter)="selectResult(r)"
               tabindex="0"

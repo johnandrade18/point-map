@@ -52,14 +52,6 @@ import { ThemeService } from '../../core/services/theme.service';
       type="file"
       accept=".geojson,application/geo+json,application/json"
       style="display:none"
-      (change)="onFileSelected($event, 'replace')"
-      aria-hidden="true"
-    />
-    <input
-      #appendFileInput
-      type="file"
-      accept=".geojson,application/geo+json,application/json"
-      style="display:none"
       (change)="onFileSelected($event, 'append')"
       aria-hidden="true"
     />
@@ -118,26 +110,15 @@ import { ThemeService } from '../../core/services/theme.service';
 
       <div class="tb-divider"></div>
 
-      <!-- Import (replace) -->
+      <!-- Import (append, skip duplicates) -->
       <button
         class="tb-btn"
         (click)="fileInput.click()"
-        matTooltip="Import a GeoJSON FeatureCollection — replaces current data"
+        matTooltip="Import a GeoJSON FeatureCollection — merges with existing data, skips duplicates"
         aria-label="Import GeoJSON"
       >
         <svg lucideUpload [size]="15"></svg>
         <span>Import</span>
-      </button>
-
-      <!-- Import (append) -->
-      <button
-        class="tb-btn"
-        (click)="appendFileInput.click()"
-        matTooltip="Append GeoJSON — merges with existing points"
-        aria-label="Append GeoJSON"
-      >
-        <svg lucideUpload [size]="15"></svg>
-        <span>Add</span>
       </button>
 
       <!-- Export GeoJSON -->
@@ -310,7 +291,6 @@ export class ToolbarComponent {
   private readonly snackBar = inject(MatSnackBar);
 
   @ViewChild('fileInput') private fileInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('appendFileInput') private appendFileInput!: ElementRef<HTMLInputElement>;
 
   // ── Keyboard shortcuts ──────────────────────────────────────────────────────
   @HostListener('document:keydown', ['$event'])
@@ -340,10 +320,9 @@ export class ToolbarComponent {
     try {
       const { features, result } = await this.importer.parseFile(file);
       this.store.importPoints(features, result, mode);
-      const action = mode === 'append' ? 'Appended' : 'Imported';
       this.snackBar.open(
-        `${action} ${result.imported} Point(s) of Interest` +
-          (result.discarded.length > 0 ? ` — ${result.discarded.length} discarded` : ''),
+        `Imported ${result.imported} Point(s) of Interest` +
+          (result.discarded.length > 0 ? ` — ${result.discarded.length} skipped` : ''),
         'OK',
         { duration: 4000 }
       );

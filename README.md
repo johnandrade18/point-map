@@ -1,6 +1,6 @@
-# POI Map Editor
+# Point Map
 
-An Angular + MapLibre GL JS application for creating, editing, and managing Points of Interest (POIs) on an interactive map, with GeoJSON import/export and localStorage persistence.
+An Angular + MapLibre GL JS application for creating, editing, and managing Points of Interest (Points) on an interactive map, with GeoJSON import/export and localStorage persistence.
 
 ---
 
@@ -51,8 +51,8 @@ ng test
 | 4   | Add POI         | Toggle **Add Point**, then click anywhere on the map                                          |
 | 5   | Edit POI        | Click a circle on the map or an item in the sidebar list; edit name/category inline           |
 | 6   | Delete POI      | **Delete** button in the edit form                                                            |
-| 7   | Persist locally | **Save** button writes `poi_editor_state` to `localStorage`; auto-restored on next load       |
-| 8   | Export GeoJSON  | **Export** downloads `pois-export.geojson`                                                    |
+| 7   | Persist locally | **Save** button writes `point_editor_state` to `localStorage`; auto-restored on next load       |
+| 8   | Export GeoJSON  | **Export** downloads `points-export.geojson`                                                    |
 | 9   | Error tolerance | Invalid features are skipped; banner shows `"Imported N / Discarded M (k× reason, …)"`        |
 | 10  | Search & filter | Name search + category dropdown in the sidebar                                                |
 
@@ -66,7 +66,7 @@ ng test
 src/app/
 ├── core/                       # Domain models, validators, services
 │   ├── models/
-│   │   ├── poi.model.ts        # PoiFeature, PoiFeatureCollection, Coordinates
+│   │   ├── point.model.ts        # PoiFeature, PoiFeatureCollection, Coordinates
 │   │   └── import-result.model.ts
 │   ├── validators/
 │   │   └── geojson-feature.validator.ts   # Pure functions, fully unit-tested
@@ -74,15 +74,15 @@ src/app/
 │       ├── local-storage.service.ts       # Thin storage abstraction
 │       ├── geojson-import.service.ts      # Parse + validate GeoJSON files
 │       ├── geojson-export.service.ts      # Serialise + download
-│       └── poi-store.service.ts           # Central signals-based state store
+│       └── point-store.service.ts           # Central signals-based state store
 ├── features/
 │   ├── map/
 │   │   ├── map-renderer.service.ts        # All MapLibre GL API calls
 │   │   └── map.component.ts              # Hosts canvas; bridges store → renderer
-│   └── poi-panel/
-│       ├── poi-panel.component.ts         # Left sidebar (search, list, form)
-│       ├── poi-list/                      # Scrollable POI rows
-│       ├── poi-form/                      # Reactive inline edit/delete form
+│   └── point-panel/
+│       ├── point-panel.component.ts         # Left sidebar (search, list, form)
+│       ├── point-list/                      # Scrollable POI rows
+│       ├── point-form/                      # Reactive inline edit/delete form
 │       └── import-summary/               # Dismissible import-result banner
 └── shared/
     └── toolbar/                           # Top action bar
@@ -92,7 +92,7 @@ src/app/
 
 #### 1. Angular Signals for state
 
-`PoiStoreService` exposes only `signal.asReadonly()` to consumers. Mutations go through explicit methods (`addPoi`, `updatePoi`, `deletePoi`, …). `computed()` signals derive filtered lists and categories automatically, eliminating manual subscription management.
+`PointStoreService` exposes only `signal.asReadonly()` to consumers. Mutations go through explicit methods (`addPoint`, `updatePoint`, `deletePoint`, …). `computed()` signals derive filtered lists and categories automatically, eliminating manual subscription management.
 
 #### 2. MapLibre decoupled in `MapRendererService`
 
@@ -136,12 +136,12 @@ Extra properties are preserved.
 
 ## Trade-offs & Known Limitations
 
-- **No undo/redo** — out of scope for MVP; could be added with a command pattern or `ngrx/store`.
+- **Undo/redo** — implemented with two in-memory stacks (max 50 steps each), accessible via toolbar buttons and Ctrl+Z / Ctrl+Y shortcuts.
 - **localStorage only** — for a production app, a backend (REST/GraphQL) would replace or supplement this.
 - **Label font** — MapLibre's default font stack (`Open Sans Regular`) is bundled in the demo style; if using a custom tile style, fonts must match its glyphs URL.
 - **No multipart geometry** — Lines and polygons are intentionally out of scope (rejected at import). Scaling to those types would require additional layer types in `MapRendererService` and an extended form.
-- **Snapping** — a grid-snap bonus feature is not implemented; it could be added by rounding `lon/lat` to a configurable decimal precision in `PoiStoreService.addPoi`.
-- **No clustering** — MapLibre supports `cluster: true` in the GeoJSON source config; adding it is a two-line change but was omitted to keep the implementation straightforward.
+- **Snapping** — full grid-snap is not implemented; a proximity duplicate warning (< 15 m threshold) is shown instead when placing a point near an existing one.
+- **Clustering** — implemented via MapLibre's native `cluster: true` source option with step-based circle sizing and expand-on-click behaviour.
 
 ---
 

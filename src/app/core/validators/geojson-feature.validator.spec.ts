@@ -69,6 +69,7 @@ describe('validateGeoJsonFeature', () => {
     });
 
     it('should generate a uuid when id is missing', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id: _id, ...noId } = validFeature;
       const result = validateGeoJsonFeature(noId);
       if (result.valid) {

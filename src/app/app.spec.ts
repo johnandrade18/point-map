@@ -43,7 +43,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-poi-panel')).not.toBeNull();
+    expect(compiled.querySelector('app-point-panel')).not.toBeNull();
   });
 
   it('should render the map area', () => {

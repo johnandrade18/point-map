@@ -9,6 +9,7 @@ export const DISCARD_REASON_LABELS: Record<string, string> = {
   'missing-properties': 'missing properties object',
   'invalid-name': 'name is missing or not a non-empty string',
   'invalid-category': 'category is missing or not a non-empty string',
+  'duplicate-id': 'duplicate — already exists in current data',
 };
 
 export type DiscardReason = keyof typeof DISCARD_REASON_LABELS;

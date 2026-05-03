@@ -44,7 +44,7 @@ const PREDEFINED_CATEGORIES = [
             <svg lucidePencil [size]="13" class="form-title-icon"></svg>
             Edit Point
           </div>
-          <button class="close-btn" (click)="store.selectPoint('')" aria-label="Close editor">
+          <button class="close-btn" (click)="store.selectPoint(null)" aria-label="Close editor">
             <svg lucideX [size]="13"></svg>
           </button>
         </div>
@@ -53,8 +53,9 @@ const PREDEFINED_CATEGORIES = [
 
           <!-- Name -->
           <div class="field-group">
-            <label class="field-label">Name</label>
+            <label class="field-label" for="poi-name">Name</label>
             <input
+              id="poi-name"
               class="field-input"
               [class.field-input--error]="form.controls['name'].invalid && form.controls['name'].touched"
               formControlName="name"
@@ -67,8 +68,9 @@ const PREDEFINED_CATEGORIES = [
 
           <!-- Category -->
           <div class="field-group">
-            <label class="field-label">Category</label>
+            <label class="field-label" for="poi-category">Category</label>
             <select
+              id="poi-category"
               class="field-select"
               [class.field-input--error]="form.controls['category'].invalid && form.controls['category'].touched"
               formControlName="category"

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
 import { PointFeature, PointFeatureCollection } from '../models/point.model';
 import { ImportResult } from '../models/import-result.model';
@@ -82,6 +82,15 @@ export class PointStoreService {
 
   constructor() {
     this.restoreFromStorage();
+
+    // Auto-save to localStorage whenever points change
+    effect(() => {
+      const collection: PointFeatureCollection = {
+        type: 'FeatureCollection',
+        features: this._points(),
+      };
+      this.storage.save(collection);
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -97,6 +106,7 @@ export class PointStoreService {
       nearby ? `Near "${nearby.properties.name}" (< ${DUPLICATE_THRESHOLD_M} m)` : null,
     );
 
+    this.pushUndo();
     const newPoint: PointFeature = {
       type: 'Feature',
       id: uuidv4(),
@@ -156,7 +166,25 @@ export class PointStoreService {
   importPoints(features: PointFeature[], result: ImportResult, mode: 'replace' | 'append' = 'replace'): void {
     if (mode === 'append') {
       this.pushUndo();
-      this._points.update((existing) => [...existing, ...features]);
+      this._points.update((existing) => {
+        const existingIds = new Set(existing.map((p) => p.id));
+        const newFeatures = features.filter((f) => !existingIds.has(f.id));
+        const duplicatesSkipped = features.length - newFeatures.length;
+        if (duplicatesSkipped > 0) {
+          result = {
+            ...result,
+            imported: newFeatures.length,
+            discarded: [
+              ...result.discarded,
+              ...Array.from({ length: duplicatesSkipped }, (_, i) => ({
+                index: -1 - i,
+                reason: 'duplicate-id',
+              })),
+            ],
+          };
+        }
+        return [...existing, ...newFeatures];
+      });
       this._selectedId.set(null);
       this._importSummary.set(result);
       this._fitBoundsTick.update((t) => t + 1);
