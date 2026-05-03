@@ -3,6 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { PointFeature, PointFeatureCollection } from '../models/point.model';
 import { ImportResult } from '../models/import-result.model';
 import { LocalStorageService } from './local-storage.service';
+import { haversineMeters } from '../utils/haversine';
+
+/** Minimum distance (metres) before a duplicate warning is raised. */
+const DUPLICATE_THRESHOLD_M = 15;
 
 @Injectable({ providedIn: 'root' })
 export class PointStoreService {
@@ -17,10 +21,10 @@ export class PointStoreService {
   private readonly _searchQuery = signal('');
   private readonly _categoryFilter = signal('');
 
-    /** Incremented each time a GeoJSON import happens → triggers fit-bounds in MapComponent. */
+  /** Incremented each time a GeoJSON import happens → triggers fit-bounds in MapComponent. */
   private readonly _fitBoundsTick = signal(0);
 
-    /** Non-null while a duplicate POI is within threshold distance. */
+  /** Non-null while a duplicate POI is within threshold distance. */
   private readonly _duplicateWarning = signal<string | null>(null);
 
   /** Undo/redo stacks hold snapshots of the POINT array (max 50 entries each). */
@@ -36,7 +40,7 @@ export class PointStoreService {
   readonly isAddMode = this._isAddMode.asReadonly();
   readonly searchQuery = this._searchQuery.asReadonly();
   readonly categoryFilter = this._categoryFilter.asReadonly();
-   readonly fitBoundsTick = this._fitBoundsTick.asReadonly();
+  readonly fitBoundsTick = this._fitBoundsTick.asReadonly();
   readonly duplicateWarning = this._duplicateWarning.asReadonly();
   readonly canUndo = computed(() => this._undoStack().length > 0);
   readonly canRedo = computed(() => this._redoStack().length > 0);
@@ -84,7 +88,15 @@ export class PointStoreService {
   // Mutations
   // ---------------------------------------------------------------------------
 
-  addPoint(lon: number, lat: number): void {
+  addPoint(lon: number, lat: number): string {
+    const nearby = this._points().find((p) => {
+      const [pLon, pLat] = p.geometry.coordinates;
+      return haversineMeters(lon, lat, pLon, pLat) < DUPLICATE_THRESHOLD_M;
+    });
+    this._duplicateWarning.set(
+      nearby ? `Near "${nearby.properties.name}" (< ${DUPLICATE_THRESHOLD_M} m)` : null,
+    );
+
     const newPoint: PointFeature = {
       type: 'Feature',
       id: uuidv4(),
@@ -94,9 +106,11 @@ export class PointStoreService {
     this._points.update((points) => [...points, newPoint]);
     this._selectedId.set(newPoint.id);
     this._isAddMode.set(false);
+    return newPoint.id;
   }
 
   updatePoint(id: string, updates: Partial<PointFeature['properties']>): void {
+    this.pushUndo();
     this._points.update((points) =>
       points.map((p) => (p.id === id ? { ...p, properties: { ...p.properties, ...updates } } : p)),
     );
